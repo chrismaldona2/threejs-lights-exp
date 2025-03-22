@@ -9,7 +9,7 @@ import GUI from "lil-gui";
 
 document.getElementById("app")!.innerHTML = `<canvas id="canvas"/>`;
 
-const gui = new GUI({ title: "Lights", closeFolders: true });
+const gui = new GUI({ title: "Tweaks", closeFolders: true });
 
 //
 // SETUP
@@ -66,9 +66,6 @@ controls.enableDamping = true;
 //
 // objects
 //
-const material = new THREE.MeshStandardMaterial({
-  roughness: 0.5,
-});
 
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(100, 100),
@@ -77,11 +74,26 @@ const floor = new THREE.Mesh(
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 
-const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1), material);
+const ring = new THREE.Mesh(
+  new THREE.TorusGeometry(0.5, 0.1),
+  new THREE.MeshStandardMaterial({
+    roughness: 0.5,
+  })
+);
 ring.position.set(0, 1, -2);
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5), material);
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5),
+  new THREE.MeshStandardMaterial({
+    roughness: 0.5,
+  })
+);
 sphere.position.set(2, 1, -2);
-const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1), material);
+const box = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1),
+  new THREE.MeshStandardMaterial({
+    roughness: 0.5,
+  })
+);
 box.position.set(-2, 1, -2);
 scene.add(floor, ring, sphere, box);
 
@@ -92,11 +104,13 @@ box.castShadow = true;
 //
 // LIGHTS
 //
+const lightTweaks = gui.addFolder("Lights");
+
 //
 // ambient light
 //
 const ambientLight = new THREE.AmbientLight(0xffffff, 0);
-const ambientLightTweaks = gui.addFolder("Ambient Light");
+const ambientLightTweaks = lightTweaks.addFolder("Ambient Light");
 ambientLightTweaks.addColor(ambientLight, "color").name("Color");
 ambientLightTweaks
   .add(ambientLight, "intensity")
@@ -113,7 +127,7 @@ directionalLight.position.set(5, 5, 5);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.width = 1024;
 directionalLight.shadow.mapSize.height = 1024;
-const directionalLightTweaks = gui.addFolder("Directional light");
+const directionalLightTweaks = lightTweaks.addFolder("Directional light");
 directionalLightTweaks.addColor(directionalLight, "color").name("Color");
 directionalLightTweaks
   .add(directionalLight, "intensity")
@@ -130,8 +144,8 @@ directionalLightPosition.add(directionalLight.position, "z").min(-20).max(20);
 //
 // hemisphere light
 //
-const hemisphereLight = new THREE.HemisphereLight(0x00ffcc, 0x34e830, 0);
-const hemisphereLightTweaks = gui.addFolder("Hemisphere Light");
+const hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0xf4a460, 0);
+const hemisphereLightTweaks = lightTweaks.addFolder("Hemisphere Light");
 hemisphereLightTweaks.addColor(hemisphereLight, "color").name("Color");
 hemisphereLightTweaks
   .addColor(hemisphereLight, "groundColor")
@@ -146,12 +160,12 @@ hemisphereLightTweaks
 //
 // point light
 //
-const pointLight = new THREE.PointLight(0xffffff, 0);
+const pointLight = new THREE.PointLight(0xffffff, 0, 0, 2);
 pointLight.position.set(0, 2.25, 1);
 pointLight.castShadow = true;
 pointLight.shadow.mapSize.width = 1024;
 pointLight.shadow.mapSize.height = 1024;
-const pointLightTweaks = gui.addFolder("Point light");
+const pointLightTweaks = lightTweaks.addFolder("Point light");
 pointLightTweaks.addColor(pointLight, "color").name("Color");
 pointLightTweaks
   .add(pointLight, "intensity")
@@ -183,7 +197,7 @@ pointLightPosition.add(pointLight.position, "z").min(-20).max(20);
 const rectAreaLight = new THREE.RectAreaLight(0xffffff, 0, 10, 10);
 rectAreaLight.position.z = -5;
 rectAreaLight.rotation.y = Math.PI;
-const rectAreaLightTweaks = gui.addFolder("Rect Area light");
+const rectAreaLightTweaks = lightTweaks.addFolder("Rect Area light");
 rectAreaLightTweaks.addColor(rectAreaLight, "color").name("Color");
 rectAreaLightTweaks
   .add(rectAreaLight, "intensity")
@@ -235,7 +249,7 @@ spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 spotLight.position.set(-0.6, 0.5, 3);
 spotLight.target.position.set(0.5, 0, -10);
-const spotLightTweaks = gui.addFolder("Spot light");
+const spotLightTweaks = lightTweaks.addFolder("Spot light");
 spotLightTweaks.open();
 spotLightTweaks.addColor(spotLight, "color").name("Color");
 spotLightTweaks
@@ -317,6 +331,12 @@ scene.add(
   spotLightHelper,
   rectAreaLightHelper
 );
+
+const objectTweaks = gui.addFolder("Objects");
+objectTweaks.addColor(floor.material, "color").name("Floor color");
+objectTweaks.addColor(box.material, "color").name("Box color");
+objectTweaks.addColor(ring.material, "color").name("Ring color");
+objectTweaks.addColor(sphere.material, "color").name("Sphere color");
 
 //
 // animation
