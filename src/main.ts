@@ -51,6 +51,8 @@ scene.add(camera);
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+renderer.shadowMap.enabled = true;
+
 const render = () => {
   renderer.render(scene, camera);
 };
@@ -73,6 +75,7 @@ const floor = new THREE.Mesh(
   new THREE.MeshStandardMaterial()
 );
 floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
 
 const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1), material);
 ring.position.set(0, 1, -2);
@@ -80,8 +83,11 @@ const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5), material);
 sphere.position.set(2, 1, -2);
 const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1), material);
 box.position.set(-2, 1, -2);
-
 scene.add(floor, ring, sphere, box);
+
+ring.castShadow = true;
+sphere.castShadow = true;
+box.castShadow = true;
 
 //
 // LIGHTS
@@ -105,6 +111,8 @@ ambientLightTweaks
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0);
 directionalLight.position.set(5, 5, 5);
 directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
 const directionalLightTweaks = gui.addFolder("Directional light");
 directionalLightTweaks.addColor(directionalLight, "color").name("Color");
 directionalLightTweaks
@@ -139,8 +147,10 @@ hemisphereLightTweaks
 // point light
 //
 const pointLight = new THREE.PointLight(0xffffff, 0);
-pointLight.position.set(0, 0.8, 1);
+pointLight.position.set(0, 2.25, 1);
 pointLight.castShadow = true;
+pointLight.shadow.mapSize.width = 1024;
+pointLight.shadow.mapSize.height = 1024;
 const pointLightTweaks = gui.addFolder("Point light");
 pointLightTweaks.addColor(pointLight, "color").name("Color");
 pointLightTweaks
@@ -221,6 +231,8 @@ rectAreaLightPosition.add(rectAreaLight.position, "z").min(-20).max(20);
 //
 const spotLight = new THREE.SpotLight(0x2ff1f4, 5, 7.8, Math.PI * 0.25, 0.4, 1);
 spotLight.castShadow = true;
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
 spotLight.position.set(-0.6, 0.5, 3);
 spotLight.target.position.set(0.5, 0, -10);
 const spotLightTweaks = gui.addFolder("Spot light");
