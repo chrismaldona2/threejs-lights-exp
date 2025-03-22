@@ -136,6 +136,14 @@ directionalLightTweaks
   .step(0.001)
   .name("Intensity");
 directionalLightTweaks.add(directionalLight, "castShadow").name("Cast shadow");
+const directionalLightHelper = new THREE.DirectionalLightHelper(
+  directionalLight,
+  0.25
+);
+directionalLightHelper.visible = false;
+directionalLightTweaks
+  .add(directionalLightHelper, "visible")
+  .name("Show helper");
 const directionalLightPosition = directionalLightTweaks.addFolder("Position");
 directionalLightPosition.add(directionalLight.position, "x").min(-20).max(20);
 directionalLightPosition.add(directionalLight.position, "y").min(0).max(10);
@@ -156,6 +164,12 @@ hemisphereLightTweaks
   .max(3)
   .step(0.001)
   .name("Intensity");
+const hemisphereLightHelper = new THREE.HemisphereLightHelper(
+  hemisphereLight,
+  0.25
+);
+hemisphereLightHelper.visible = false;
+hemisphereLightTweaks.add(hemisphereLightHelper, "visible").name("Show helper");
 
 //
 // point light
@@ -186,6 +200,9 @@ pointLightTweaks
   .step(0.01)
   .name("Decay");
 pointLightTweaks.add(pointLight, "castShadow").name("Cast shadow");
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.25);
+pointLightHelper.visible = false;
+pointLightTweaks.add(pointLightHelper, "visible").name("Show helper");
 const pointLightPosition = pointLightTweaks.addFolder("Position");
 pointLightPosition.add(pointLight.position, "x").min(-20).max(20);
 pointLightPosition.add(pointLight.position, "y").min(0).max(10);
@@ -218,6 +235,9 @@ rectAreaLightTweaks
   .step(0.01)
   .name("Height");
 
+const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight);
+rectAreaLightHelper.visible = false;
+rectAreaLightTweaks.add(rectAreaLightHelper, "visible").name("Show helper");
 const rectAreaLightMethods = {
   lookAtRing: () => rectAreaLight.lookAt(ring.position),
   lookAtSphere: () => rectAreaLight.lookAt(sphere.position),
@@ -278,58 +298,62 @@ spotLightTweaks
   .name("Penumbra");
 spotLightTweaks.add(spotLight, "decay").min(0).max(8).step(0.01).name("Decay");
 spotLightTweaks.add(spotLight, "castShadow").name("Cast shadow");
+
+// spot light helper
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+spotLightHelper.visible = false;
+spotLightTweaks.add(spotLightHelper, "visible").name("Show helper");
+
 const spotLightPosition = spotLightTweaks.addFolder("Position");
 spotLightPosition.add(spotLight.position, "x").min(-10).max(10).step(0.1);
 spotLightPosition.add(spotLight.position, "y").min(0).max(5).step(0.1);
 spotLightPosition.add(spotLight.position, "z").min(-10).max(10).step(0.1);
-const spotLightTarget = spotLightTweaks.addFolder("Target");
-spotLightTarget.add(spotLight.target.position, "x").min(-10).max(10).step(0.1);
-spotLightTarget.add(spotLight.target.position, "y").min(0).max(5).step(0.1);
-spotLightTarget.add(spotLight.target.position, "z").min(-10).max(10).step(0.1);
+
+const spotLightTargetTweaks = spotLightTweaks.addFolder("Target");
+spotLightTargetTweaks
+  .add(spotLight.target.position, "x")
+  .min(-10)
+  .max(10)
+  .step(0.1);
+spotLightTargetTweaks
+  .add(spotLight.target.position, "y")
+  .min(0)
+  .max(5)
+  .step(0.1);
+spotLightTargetTweaks
+  .add(spotLight.target.position, "z")
+  .min(-10)
+  .max(10)
+  .step(0.1);
+
+const spotLightTargetMethods = {
+  lookAtRing: () => spotLight.target.position.copy(ring.position),
+  lookAtSphere: () => spotLight.target.position.copy(sphere.position),
+  lookAtBox: () => spotLight.target.position.copy(box.position),
+};
+spotLightTargetTweaks
+  .add(spotLightTargetMethods, "lookAtRing")
+  .name("Look at ring");
+spotLightTargetTweaks
+  .add(spotLightTargetMethods, "lookAtSphere")
+  .name("Look at sphere");
+spotLightTargetTweaks
+  .add(spotLightTargetMethods, "lookAtBox")
+  .name("Look at box");
 
 scene.add(
   ambientLight,
   directionalLight,
-  hemisphereLight,
-  pointLight,
-  rectAreaLight,
-  spotLight,
-  spotLight.target
-);
-
-//
-// light helpers
-//
-const hemisphereLightHelper = new THREE.HemisphereLightHelper(
-  hemisphereLight,
-  0.25
-);
-hemisphereLightHelper.visible = false;
-hemisphereLightTweaks.add(hemisphereLightHelper, "visible").name("Show helper");
-const directionalLightHelper = new THREE.DirectionalLightHelper(
-  directionalLight,
-  0.25
-);
-directionalLightHelper.visible = false;
-directionalLightTweaks
-  .add(directionalLightHelper, "visible")
-  .name("Show helper");
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.25);
-pointLightHelper.visible = false;
-pointLightTweaks.add(pointLightHelper, "visible").name("Show helper");
-const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-spotLightHelper.visible = false;
-spotLightTweaks.add(spotLightHelper, "visible").name("Show helper");
-const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight);
-rectAreaLightHelper.visible = false;
-rectAreaLightTweaks.add(rectAreaLightHelper, "visible").name("Show helper");
-
-scene.add(
-  hemisphereLightHelper,
   directionalLightHelper,
+  hemisphereLight,
+  hemisphereLightHelper,
+  pointLight,
   pointLightHelper,
-  spotLightHelper,
-  rectAreaLightHelper
+  rectAreaLight,
+  rectAreaLightHelper,
+  spotLight,
+  spotLight.target,
+  spotLightHelper
 );
 
 const objectTweaks = gui.addFolder("Objects");
